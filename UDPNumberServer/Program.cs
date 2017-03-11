@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UDPNumberServer
@@ -12,18 +13,22 @@ namespace UDPNumberServer
     {
         static void Main(string[] args)
         {
-            ////Creates a UdpClient for reading AND sending incoming data.
-            //UdpClient udpServer = new UdpClient(9999);
 
-            //Creates an IPEndPoint to record the IP Address and port number of the sender.  
-            IPAddress ip = IPAddress.Parse("127.0.0.1");
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(ip, 9999);
-            //udpServer.Connect(RemoteIpEndPoint);
+            UDPNumberSender theSender = new UDPNumberSender(9999);
 
-            //UDPNumberSender theSender = new UDPNumberSender(udpServer,RemoteIpEndPoint);
-            UDPNumberSender theSender = new UDPNumberSender(RemoteIpEndPoint);
-
+            #region Infinite number sending
             theSender.StartSending();
+            #endregion
+
+            #region If sender should stop sending after a specific amount of time
+            //Task.Factory.StartNew(() => theSender.StartSending());
+
+            ////Sets the amount of time for the listener to listen before invkong the StopListening method
+            ////this is to prevent that the program ends before receiving anything
+            //Thread.Sleep(5000);
+
+            //theSender.StopSending();
+            #endregion
         }
     }
 }

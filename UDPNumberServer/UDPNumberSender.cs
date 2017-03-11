@@ -4,77 +4,73 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UDPNumberServer
 {
     class UDPNumberSender
     {
-        private IPEndPoint remoteIpEndPoint;
-        //private UdpClient udpServer;
+        #region Instance Fields and Properties
 
-        public UDPNumberSender(IPEndPoint remoteIpEndPoint)
+        private UdpClient _udpSender;
+        public int LocalPortNumber { get; set; }
+        public bool UdpSenderIsRunning { get; set; }
+
+        #endregion
+
+        #region Constructors
+
+        public UDPNumberSender(int localPortNumber)
         {
-            this.remoteIpEndPoint = remoteIpEndPoint;
+            UdpSenderIsRunning = false;
+            LocalPortNumber = localPortNumber;
+            this._udpSender = new UdpClient("127.0.0.1", localPortNumber);
         }
 
-        //public UDPNumberSender(UdpClient udpServer, IPEndPoint remoteIpEndPoint)
-        //{
-        //    this.udpServer = udpServer;
-        //    this.remoteIpEndPoint = remoteIpEndPoint;
-        //}
+        #endregion
 
+        #region Methods
+
+        /// <summary>
+        /// Starts sending numbers
+        /// </summary>
         public void StartSending()
         {
-            Socket sending_socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            bool exception_thrown = false;
+            UdpSenderIsRunning = true;
 
             try
             {
                 int i = 0;
 
-                while (true)
+                while (UdpSenderIsRunning)
                 {
-                    #region Test code
-                    //Byte[] receiveBytes = udpServer.Receive(ref RemoteIpEndPoint);
+                    string messageToSend = $"Number is: {i.ToString()}";
+                    Byte[] sendBytes = Encoding.ASCII.GetBytes(messageToSend);
+                    _udpSender.Send(sendBytes, sendBytes.Length);
 
-                    //string sendData = $"The number is {i}";
-                    #endregion
-
-                    Byte[] sendBytes = Encoding.ASCII.GetBytes(i.ToString());
-                    //udpServer.Send(sendBytes, sendBytes.Length, remoteIpEndPoint);
-
-                    Console.WriteLine($"Number sent: {i}");
-
-                    #region copy pasta from MSDN
-                    try
-                    {
-                        sending_socket.SendTo(sendBytes, remoteIpEndPoint);
-                    }
-                    catch (Exception send_exception)
-                    {
-                        exception_thrown = true;
-                        Console.WriteLine(" Exception {0}", send_exception.Message);
-                    }
-
-                    if (exception_thrown == false)
-                    {
-                        Console.WriteLine("Message has been sent to the broadcast address");
-                    }
-                    else
-                    {
-                        exception_thrown = false;
-                        Console.WriteLine("The exception indicates the message was not sent.");
-                    }
-                    #endregion
+                    Console.WriteLine($"\nNumber sent: {i}");
 
                     i++;
+                    Thread.Sleep(500);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
+
+            _udpSender.Close();
         }
+
+        /// <summary>
+        /// Stops sending numbers
+        /// </summary>
+        public void StopSending()
+        {
+            UdpSenderIsRunning = false;
+        }
+
+        #endregion
     }
 }
