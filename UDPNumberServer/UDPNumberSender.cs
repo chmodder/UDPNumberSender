@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UDPNumberServer
@@ -11,19 +12,12 @@ namespace UDPNumberServer
     class UDPNumberSender
     {
         private IPEndPoint remoteIpEndPoint;
-        //private UdpClient udpServer;
 
         public UDPNumberSender(IPEndPoint remoteIpEndPoint)
         {
             this.remoteIpEndPoint = remoteIpEndPoint;
         }
-
-        //public UDPNumberSender(UdpClient udpServer, IPEndPoint remoteIpEndPoint)
-        //{
-        //    this.udpServer = udpServer;
-        //    this.remoteIpEndPoint = remoteIpEndPoint;
-        //}
-
+        
         public void StartSending()
         {
             Socket sending_socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -35,18 +29,10 @@ namespace UDPNumberServer
 
                 while (true)
                 {
-                    #region Test code
-                    //Byte[] receiveBytes = udpServer.Receive(ref RemoteIpEndPoint);
-
-                    //string sendData = $"The number is {i}";
-                    #endregion
 
                     Byte[] sendBytes = Encoding.ASCII.GetBytes(i.ToString());
-                    //udpServer.Send(sendBytes, sendBytes.Length, remoteIpEndPoint);
 
-                    Console.WriteLine($"Number sent: {i}");
-
-                    #region copy pasta from MSDN
+                    #region copy pasta from codeproject.com
                     try
                     {
                         sending_socket.SendTo(sendBytes, remoteIpEndPoint);
@@ -60,6 +46,7 @@ namespace UDPNumberServer
                     if (exception_thrown == false)
                     {
                         Console.WriteLine("Message has been sent to the broadcast address");
+                        Console.WriteLine($"Message sent: {i}\n");
                     }
                     else
                     {
@@ -67,6 +54,8 @@ namespace UDPNumberServer
                         Console.WriteLine("The exception indicates the message was not sent.");
                     }
                     #endregion
+
+                    Thread.Sleep(200);
 
                     i++;
                 }
