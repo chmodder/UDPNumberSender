@@ -14,14 +14,16 @@ namespace UDPNumberServer
         static void Main(string[] args)
         {
 
-            UDPNumberSender theSender = new UDPNumberSender(9999);
+            UDPNumberSenderBroad theSender = new UDPNumberSenderBroad(9999);
 
             #region Infinite number sending
-            theSender.StartSending();
+
+            theSender.StartBroadcasting();
+
             #endregion
 
             #region If sender should stop sending after a specific amount of time
-            //Task.Factory.StartNew(() => theSender.StartSending());
+            //Task.Factory.StartNew(() => theSender.StartBroadcasting());
 
             ////Sets the amount of time for the listener to listen before invkong the StopListening method
             ////this is to prevent that the program ends before receiving anything
