@@ -30,6 +30,7 @@ namespace UDPNumberServer
             UdpSenderIsRunning = false;
             LocalPortNumber = localPortNumber;
 
+            //Setting parameter to zero means it will use all ports (broadcast)
             this._udpSender = new UdpClient(0);
             this._udpSender.EnableBroadcast = true;
 
@@ -53,14 +54,18 @@ namespace UDPNumberServer
 
                 while (UdpSenderIsRunning)
                 {
+                    //create message and encode to Byte array
                     string messageToSend = $"Number sent by me is: {i.ToString()}, ";
                     Byte[] sendBytes = Encoding.ASCII.GetBytes(messageToSend);
 
+                    //Send the byte array (messageAsByteArray, numberOfBytes, localEndpoint)
                     _udpSender.Send(sendBytes, sendBytes.Length,BroadcastEndPoint);
 
                     Console.WriteLine($"\nNumber sent: {i}");
 
                     i++;
+
+                    //Wait 500 ms to send the next message
                     Thread.Sleep(500);
                 }
             }
